@@ -1,0 +1,51 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Me-API Playground</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <header>
+    <h1>Me-API Playground</h1>
+    <p class="muted">Backend Assessment — Track A</p>
+  </header>
+
+  <main>
+    <section id="profile-section">
+      <h2>Profile</h2>
+      <div id="profile"></div>
+    </section>
+
+    <section>
+      <h2>Top Skills</h2>
+      <ul id="top-skills"></ul>
+    </section>
+
+    <section>
+      <h2>Search</h2>
+      <input id="search-input" placeholder="Search projects or skills...">
+      <button id="search-btn">Search</button>
+      <div id="search-results"></div>
+    </section>
+
+    <section>
+      <h2>Projects</h2>
+      <div class="controls">
+        <input id="skill-filter" placeholder="Filter by skill (e.g., Python)">
+        <button id="filter-btn">Filter</button>
+        <button id="clear-btn">Clear</button>
+      </div>
+      <div id="projects"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p class="muted">API served at <code>/api</code>. Health: <code id="health">checking...</code></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

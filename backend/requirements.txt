@@ -1,0 +1,35 @@
+# Me-API Playground
+A FastAPI + SQLModel based backend (with simple frontend) to showcase my profile, projects, skills, and work experience.  
+This project was built as part of a backend assessment.
+
+---
+
+
+- REST API exposing:
+  - `/api/profile` → My profile (name, email, education, links).
+  - `/api/skills` → All skills.
+  - `/api/skills/top` → Skills ranked by usage in projects.
+  - `/api/projects` → List of projects (filter by skill).
+  - `/api/projects/{id}` → Single project with skills.
+  - `/api/work` → Work experiences.
+  - `/api/search?q=...` → Search projects & skills.
+- Basic authentication for write operations (`X-API-Key` header).
+- SQLite database with auto-seeding from my resume.
+- CORS enabled (frontend + backend integration).
+
+---
+
+## 🏗 Architecture
+- **Backend**: FastAPI + SQLModel + SQLite (deployed on Render).
+- **Frontend**: Static site (React/Vite) served via Vercel.
+- **Database**: SQLite (auto-generated on startup, seeded with resume data).
+
+---
+
+## 📦 Setup Instructions
+
+### Local
+1. Clone repo:
+   ```bash
+   git clone https://github.com/<dhruvbareja>/me-api-playground.git
+   cd me-api-playground
