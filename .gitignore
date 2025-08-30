@@ -1,0 +1,22 @@
+# Byte-compiled / cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# SQLite databases
+*.db
+
+# macOS system files
+.DS_Store
+
+# Logs
+*.log
+
+# IDE/project settings
+.vscode/
+.idea/
