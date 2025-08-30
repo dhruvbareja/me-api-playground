@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,35 +9,37 @@
 <body>
   <header>
     <h1>Me-API Playground</h1>
-    <p class="muted">Backend Assessment — Track A</p>
+    <p class="muted">🚀 Interactive Portfolio API</p>
   </header>
 
   <main>
     <section id="profile-section">
-      <h2>Profile</h2>
-      <div id="profile"></div>
+      <h2>👤 Profile</h2>
+      <div id="profile" class="card"></div>
     </section>
 
     <section>
-      <h2>Top Skills</h2>
-      <ul id="top-skills"></ul>
+      <h2>💡 Top Skills</h2>
+      <div id="top-skills" class="tags"></div>
     </section>
 
     <section>
-      <h2>Search</h2>
-      <input id="search-input" placeholder="Search projects or skills...">
-      <button id="search-btn">Search</button>
+      <h2>🔍 Search</h2>
+      <div class="controls">
+        <input id="search-input" placeholder="Search projects or skills...">
+        <button id="search-btn">Search</button>
+      </div>
       <div id="search-results"></div>
     </section>
 
     <section>
-      <h2>Projects</h2>
+      <h2>📂 Projects</h2>
       <div class="controls">
         <input id="skill-filter" placeholder="Filter by skill (e.g., Python)">
         <button id="filter-btn">Filter</button>
         <button id="clear-btn">Clear</button>
       </div>
-      <div id="projects"></div>
+      <div id="projects" class="grid"></div>
     </section>
   </main>
 

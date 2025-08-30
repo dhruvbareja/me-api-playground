@@ -1,17 +1,84 @@
+/* Global reset */
+body {
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f9fafb;
+  color: #333;
+  line-height: 1.6;
+}
 
-* { box-sizing: border-box; }
-body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; color: #222; background: #fafafa;}
-header { padding: 24px; background: #111; color: #fff; }
-header h1 { margin: 0 0 4px 0; }
-header .muted { color: #bbb; margin: 0; }
-main { max-width: 900px; margin: 24px auto; padding: 0 16px; }
-section { background: #fff; padding: 16px; margin-bottom: 16px; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-h2 { margin-top: 0; }
-.muted { color: #666; }
-#projects .card, #search-results .card { border: 1px solid #eee; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
-.tag { display: inline-block; padding: 2px 8px; margin: 2px; border-radius: 999px; background: #f0f0f0; font-size: 12px; }
-.controls { margin-bottom: 8px; }
-input { padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
-button { padding: 8px 12px; border: none; border-radius: 8px; background: #111; color: #fff; cursor: pointer; }
-button + button { margin-left: 8px; }
-code { background: #f4f4f4; padding: 2px 6px; border-radius: 6px; }
+header, footer {
+  text-align: center;
+  padding: 1rem;
+  background: #111827;
+  color: #fff;
+}
+
+h1, h2 {
+  margin: 0.5rem 0;
+}
+
+main {
+  max-width: 900px;
+  margin: auto;
+  padding: 1rem;
+}
+
+.muted {
+  color: #6b7280;
+  font-size: 0.9em;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.tag, .skill {
+  display: inline-block;
+  background: #e5e7eb;
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  margin: 0.2rem;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.tag:hover, .skill:hover {
+  background: #d1d5db;
+}
+
+.controls {
+  margin: 0.5rem 0;
+}
+
+input, button {
+  padding: 0.4rem 0.7rem;
+  margin: 0.2rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+button:hover {
+  background: #1d4ed8;
+}
