@@ -1,22 +1,32 @@
 
-# Me-API Playground (Backend Assessment — Track A)
+Me-API Playground (Backend Assessment — Track A)
 
-A tiny full-stack app that stores your profile, skills, projects, and work experience. 
-It exposes a clean API and a simple frontend to query/filter your data.
+This is my submission for the Backend Assessment (Track A).
+It’s basically a small full-stack playground where I put my own profile, skills, projects, and work experience into a database and then exposed them via APIs. On top of that, there’s a minimal frontend to view/search the data.
 
-## Tech
-- **Backend:** FastAPI + SQLModel (SQLite by default)
-- **Frontend:** Static HTML/CSS/JS served by FastAPI
-- **Auth:** Header-based API key for write operations (`X-API-Key`)
-- **DB:** SQLite (easy to swap to Postgres via `DATABASE_URL`)
+I built this to practice backend development with FastAPI and also connect it with a simple frontend.
 
-## Quickstart (Local)
-```bash
-python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
+⸻
+
+Tech Stack
+	•	Backend: FastAPI + SQLModel (SQLite by default, can also run on Postgres)
+	•	Frontend: Plain HTML + CSS + JavaScript (served from FastAPI)
+	•	Auth: Simple API key check (X-API-Key) for write operations
+	•	Database: SQLite (for local testing, easy to set up)
+
+## Setup virtual environment and install requirements
+python -m venv .venv && source .venv/bin/activate   # On Windows: .venv\Scripts\activate
 pip install -r backend/requirements.txt
-# Optional: set env (copies .env.example to .env and edit)
+
+# Set environment variables
 export API_KEY=changeme
 export DATABASE_URL=sqlite:///me.db
+
+Visit:
+	•	Frontend: http://127.0.0.1:8000/
+	•	API Docs: http://127.0.0.1:8000/docs
+
+# Run server
 uvicorn backend.app:app --reload
 ```
 Open http://127.0.0.1:8000/ to see the UI. API lives under `/api` (docs at `/docs`).
@@ -59,11 +69,13 @@ docker run -p 8000:8000 --env-file .env me-api
 - Use any Docker host (Render, Railway, Fly.io, etc).
 - Expose port `8000`. Ensure env vars are set.
 
-## TODO / Nice-to-have
-- Pagination on project list
-- Rate limiting (e.g., slowapi)
-- Tests with pytest + httpx
-- Basic auth for `/api/*` write routes (beyond API key)
+ Features Completed
+	•	CRUD APIs for profile, projects, skills, work experience
+	•	Minimal frontend with search and filtering
+	•	API key-based auth for write operations
+	•	SQLite database auto-seeded with my real profile data
+	•	Added pagination, logging, and rate limiting (extra features)
+	•	Basic CI with pytest
 
 ## Notes
 - Seed data is created on first run and can be edited via `/api/profile` and `/api/projects`.
