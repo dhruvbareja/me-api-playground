@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from sqlmodel import SQLModel, Field, Relationship, create_engine, Session, select
 from sqlalchemy import func
 
-# ---------- Models ----------
+#Models 
 class Profile(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
@@ -41,7 +41,7 @@ class WorkExperience(SQLModel, table=True):
     start_date: str
     end_date: Optional[str] = None
     description: Optional[str] = None
-# ---------- Response Schemas ----------
+#Response Schemas 
 class ProjectOut(BaseModel):
     id: int
     title: str
@@ -53,7 +53,7 @@ class SkillOut(BaseModel):
     name: str
     count: int
 
-# ---------- App & DB ----------
+#App & DB 
 API_KEY = os.getenv("API_KEY", "changeme")
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///me.db")
 
@@ -80,7 +80,7 @@ def auth_guard(x_api_key: Optional[str] = Header(None)):
     if API_KEY and x_api_key != API_KEY:
         raise HTTPException(status_code=401, detail="Invalid or missing X-API-Key")
 
-# ---------- Utility ----------
+#Utility 
 def to_project_out(p: Project) -> ProjectOut:
     return ProjectOut(
         id=p.id,
@@ -96,7 +96,7 @@ def maybe_seed():
         if has_profile:
             return
 
-        # ---------- Profile ----------
+        #Profile
         profile = Profile(
             name="Dhruv Bareja",
             email="dhruvbareja17@gmail.com",
@@ -107,7 +107,7 @@ def maybe_seed():
         )
         session.add(profile)
 
-        # ---------- Skills ----------
+        #Skills
         skill_names = [
             "Python", "Java", "JavaScript", "HTML", "CSS", "SQL", "Azure",
             "ReactJS", "PyTorch", "Scikit-learn", "Pandas", "Transformers",
@@ -117,11 +117,9 @@ def maybe_seed():
         session.add_all(skills)
         session.flush()
 
-        # Helper to find skill by name
         def s(name):
             return session.exec(select(Skill).where(Skill.name == name)).one()
-
-        # ---------- Projects ----------
+#projects
         p1 = Project(
             title="Fake News Detection with ABSA",
             description="Published at ICCCNT 2025. Developed an AI-powered system for detecting deceptive reviews using deep learning, graph refinement, and transformers.",
@@ -145,7 +143,7 @@ def maybe_seed():
 
         session.add_all([p1, p2, p3])
 
-        # ---------- Work Experience ----------
+        #Work Experience 
         w1 = WorkExperience(
             company="Velocity Software Solutions Pvt. Ltd.",
             role="Backend Development Intern",
@@ -157,11 +155,11 @@ def maybe_seed():
 
         session.commit()
 
-# Create tables & seed
+#Create tables
 SQLModel.metadata.create_all(engine)
 maybe_seed()
 
-# ---------- Routes ----------
+#Routes 
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
@@ -218,9 +216,9 @@ def list_projects(skill: Optional[str] = None, session: Session = Depends(get_se
     else:
         stmt = select(Project).order_by(Project.title)
     projects = session.exec(stmt).unique().all()
-    # Eager-load skills
+
     for p in projects:
-        _ = p.skills  # touch relationship
+        _ = p.skills  
     return [to_project_out(p) for p in projects]
 
 @app.get("/api/projects/{project_id}", response_model=ProjectOut)
@@ -240,7 +238,7 @@ class ProjectIn(BaseModel):
 @app.post("/api/projects", dependencies=[Depends(auth_guard)], response_model=ProjectOut, status_code=201)
 def create_project(payload: ProjectIn, session: Session = Depends(get_session)):
     project = Project(title=payload.title, description=payload.description, link=payload.link)
-    # ensure skills exist
+
     skills = []
     for name in payload.skills:
         sk = session.exec(select(Skill).where(Skill.name == name)).first()
@@ -264,7 +262,7 @@ def update_project(project_id: int, payload: ProjectIn, session: Session = Depen
     project.title = payload.title
     project.description = payload.description
     project.link = payload.link
-    # update skills
+
     new_skills = []
     for name in payload.skills:
         sk = session.exec(select(Skill).where(Skill.name == name)).first()
@@ -289,13 +287,13 @@ def delete_project(project_id: int, session: Session = Depends(get_session)):
     session.commit()
     return
 
-# Work
+#Work
 @app.get("/api/work")
 def list_work(session: Session = Depends(get_session)):
     rows = session.exec(select(WorkExperience).order_by(WorkExperience.start_date.desc())).all()
     return rows
 
-# Search
+#Search
 @app.get("/api/search")
 def search(q: str, session: Session = Depends(get_session)):
     projects = session.exec(
@@ -313,7 +311,7 @@ def search(q: str, session: Session = Depends(get_session)):
         "skills": [s.name for s in skills]
     }
 
-# ---------- Static frontend ----------
+#Static frontend
 static_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
 if os.path.isdir(static_dir):
     app.mount("/", StaticFiles(directory=static_dir, html=True), name="frontend")
