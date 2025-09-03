@@ -7,6 +7,42 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlmodel import SQLModel, Field, Relationship, create_engine, Session, select
 from sqlalchemy import func
+from datetime import datetime, timedelta
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from fastapi.security import OAuth2PasswordBearer
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from fastapi.responses import JSONResponse
+
+# 1. Create app first
+app = FastAPI(title="Me-API Playground", version="1.0.0")
+
+# 2. Setup limiter AFTER app exists
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(429, _rate_limit_exceeded_handler)
+
+# 3. Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+
+
+
+SECRET_KEY = os.getenv("SECRET_KEY", "supersecret")  # change in prod
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
 
 #Models 
 class Profile(SQLModel, table=True):
@@ -41,6 +77,14 @@ class WorkExperience(SQLModel, table=True):
     start_date: str
     end_date: Optional[str] = None
     description: Optional[str] = None
+
+
+class User(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    username: str = Field(unique=True, index=True)
+    hashed_password: str
+
+
 #Response Schemas 
 class ProjectOut(BaseModel):
     id: int
@@ -62,7 +106,7 @@ engine = create_engine(
     connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 )
 
-app = FastAPI(title="Me-API Playground", version="1.0.0")
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -81,6 +125,38 @@ def auth_guard(x_api_key: Optional[str] = Header(None)):
         raise HTTPException(status_code=401, detail="Invalid or missing X-API-Key")
 
 #Utility 
+
+# --- Auth & Security ---
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/login")
+
+def get_current_user(token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    user = session.exec(select(User).where(User.username == username)).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    return user
+
+def verify_password(plain, hashed):
+    return pwd_context.verify(plain, hashed)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+
 def to_project_out(p: Project) -> ProjectOut:
     return ProjectOut(
         id=p.id,
@@ -92,69 +168,65 @@ def to_project_out(p: Project) -> ProjectOut:
 
 def maybe_seed():
     with Session(engine) as session:
+        # Only seed profile, skills, projects, work if DB is empty
         has_profile = session.exec(select(Profile)).first()
-        if has_profile:
-            return
+        if not has_profile:
+            profile = Profile(
+                name="Dhruv Bareja",
+                email="dhruvbareja17@gmail.com",
+                education="B.Tech in Information Technology — Manipal University Jaipur (GPA: 8.71/10.0)",
+                github="https://github.com/dhruvbareja",
+                linkedin="https://www.linkedin.com/in/dhruv-bareja-a3071516b/",
+                portfolio=None
+            )
+            session.add(profile)
 
-        #Profile
-        profile = Profile(
-            name="Dhruv Bareja",
-            email="dhruvbareja17@gmail.com",
-            education="B.Tech in Information Technology — Manipal University Jaipur (GPA: 8.71/10.0)",
-            github="https://github.com/dhruvbareja",
-            linkedin="https://www.linkedin.com/in/dhruv-bareja-a3071516b/",
-            portfolio=None  # add if you have a personal portfolio link
-        )
-        session.add(profile)
+            # seed skills
+            skill_names = [
+                "Python", "Java", "JavaScript", "HTML", "CSS", "SQL", "Azure",
+                "ReactJS", "PyTorch", "Scikit-learn", "Pandas", "Transformers",
+                "Git", "GitHub", "Google Colab", "Next.js", "PHP", "Swift", "SwiftUI"
+            ]
+            skills = [Skill(name=n) for n in skill_names]
+            session.add_all(skills)
+            session.flush()
 
-        #Skills
-        skill_names = [
-            "Python", "Java", "JavaScript", "HTML", "CSS", "SQL", "Azure",
-            "ReactJS", "PyTorch", "Scikit-learn", "Pandas", "Transformers",
-            "Git", "GitHub", "Google Colab", "Next.js", "PHP", "Swift", "SwiftUI"
-        ]
-        skills = [Skill(name=n) for n in skill_names]
-        session.add_all(skills)
-        session.flush()
+            def s(name):
+                return session.exec(select(Skill).where(Skill.name == name)).one()
 
-        def s(name):
-            return session.exec(select(Skill).where(Skill.name == name)).one()
-#projects
-        p1 = Project(
-            title="Fake News Detection with ABSA",
-            description="Published at ICCCNT 2025. Developed an AI-powered system for detecting deceptive reviews using deep learning, graph refinement, and transformers.",
-            link=""
-        )
-        p1.skills = [s("Python"), s("PyTorch"), s("Transformers"), s("Scikit-learn"), s("Pandas")]
+            # projects
+            p1 = Project(
+                title="Fake News Detection with ABSA",
+                description="Published at ICCCNT 2025. Developed an AI-powered system for detecting deceptive reviews.",
+                link=""
+            )
+            p1.skills = [s("Python"), s("PyTorch"), s("Transformers"), s("Scikit-learn"), s("Pandas")]
 
-        p2 = Project(
-            title="Hotel Management Website",
-            description="Developed a full-stack website enabling secure login and room booking with database integration.",
-            link=""
-        )
-        p2.skills = [s("HTML"), s("CSS"), s("JavaScript"), s("Next.js"), s("PHP"), s("SQL")]
+            p2 = Project(
+                title="Hotel Management Website",
+                description="Developed a full-stack website enabling secure login and room booking with database integration.",
+                link=""
+            )
+            p2.skills = [s("HTML"), s("CSS"), s("JavaScript"), s("Next.js"), s("PHP"), s("SQL")]
 
-        p3 = Project(
-            title="Weather-Travel App using SwiftUI",
-            description="Created an iOS app that integrates real-time weather data and tourist spot recommendations using OpenWeather API and Google Places API.",
-            link=""
-        )
-        p3.skills = [s("Swift"), s("SwiftUI")]
+            session.add_all([p1, p2])
 
-        session.add_all([p1, p2, p3])
+            w1 = WorkExperience(
+                company="Velocity Software Solutions Pvt. Ltd.",
+                role="Backend Development Intern",
+                start_date="2024-05",
+                end_date="2024-07",
+                description="Developed RFP management backend with role-based access control, notifications, and dashboards."
+            )
+            session.add(w1)
 
-        #Work Experience 
-        w1 = WorkExperience(
-            company="Velocity Software Solutions Pvt. Ltd.",
-            role="Backend Development Intern",
-            start_date="2024-05",
-            end_date="2024-07",
-            description="Developed RFP management backend with role-based access control, notifications, and dashboards. Worked with MongoDB, Node.js, Django, and SQL."
-        )
-        session.add(w1)
+        # ✅ Always ensure admin user exists
+        admin = session.exec(select(User).where(User.username == "admin")).first()
+        if not admin:
+            user = User(username="admin", hashed_password=get_password_hash("password123"))
+            session.add(user)
 
         session.commit()
-
 #Create tables
 SQLModel.metadata.create_all(engine)
 maybe_seed()
@@ -163,6 +235,22 @@ maybe_seed()
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class LoginData(BaseModel):
+    username: str
+    password: str
+
+@app.post("/api/login", response_model=Token)
+def login(data: LoginData, session: Session = Depends(get_session)):
+    user = session.exec(select(User).where(User.username == data.username)).first()
+    if not user or not verify_password(data.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    token = create_access_token({"sub": user.username})
+    return {"access_token": token, "token_type": "bearer"}
 
 # Profile
 @app.get("/api/profile", response_model=Profile)
@@ -181,6 +269,10 @@ def upsert_profile(payload: Profile, session: Session = Depends(get_session)):
         session.add(profile)
     else:
         session.add(payload)
+
+
+
+        
     session.commit()
     return session.exec(select(Profile)).first()
 
@@ -235,7 +327,7 @@ class ProjectIn(BaseModel):
     link: Optional[str] = None
     skills: List[str] = []
 
-@app.post("/api/projects", dependencies=[Depends(auth_guard)], response_model=ProjectOut, status_code=201)
+@app.post("/api/projects", dependencies=[Depends(get_current_user)], response_model=ProjectOut, status_code=201)
 def create_project(payload: ProjectIn, session: Session = Depends(get_session)):
     project = Project(title=payload.title, description=payload.description, link=payload.link)
 
