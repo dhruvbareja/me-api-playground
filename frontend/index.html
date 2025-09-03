@@ -7,10 +7,26 @@
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-  <header>
-    <h1>Me-API Playground</h1>
-    <p class="muted">🚀 Interactive Portfolio API</p>
-  </header>
+
+ <header>
+  <h1>Me-API Playground</h1>
+  <button id="dark-toggle">🌙 Toggle Dark Mode</button>
+  <p class="muted">🚀 Interactive Portfolio API</p>
+</header>
+
+ 
+
+  <!-- Login Section -->
+  <section id="login-section" class="card">
+    <h2>🔑 Login</h2>
+    <input id="username" placeholder="Username" value="admin">
+    <input id="password" type="password" placeholder="Password" value="password123">
+    <div class="controls">
+      <button id="login-btn">Login</button>
+      <button onclick="logout()">Logout</button>
+    </div>
+    <div id="login-status" class="muted"></div>
+  </section>
 
   <main>
     <section id="profile-section">
@@ -40,6 +56,15 @@
         <button id="clear-btn">Clear</button>
       </div>
       <div id="projects" class="grid"></div>
+    </section>
+
+    <!-- Add Project Section -->
+    <section id="add-project-section" class="card">
+      <h2>➕ Add Project</h2>
+      <input id="proj-title" placeholder="Project Title">
+      <input id="proj-desc" placeholder="Description">
+      <input id="proj-skills" placeholder="Skills (comma separated)">
+      <button onclick="createProject()">Create Project</button>
     </section>
   </main>
 

@@ -6,6 +6,7 @@ body {
   background: #f9fafb;
   color: #333;
   line-height: 1.6;
+  transition: background 0.3s, color 0.3s;
 }
 
 header, footer {
@@ -15,10 +16,37 @@ header, footer {
   color: #fff;
 }
 
+/* Headings */
 h1, h2 {
   margin: 0.5rem 0;
 }
 
+/* Light mode (default) */
+body {
+  background: #f9f9f9;
+  color: #222;
+  font-family: sans-serif;
+}
+
+/* Dark mode */
+body.dark {
+  background: #121212;
+  color: #eee;
+}
+
+body.dark .card {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  color: #ddd;
+}
+
+body.dark header,
+body.dark footer {
+  background: #1a1a1a;
+  color: #ccc;
+}
+
+/* Layout */
 main {
   max-width: 900px;
   margin: auto;
@@ -36,32 +64,50 @@ main {
   padding: 1rem;
   margin: 0.5rem 0;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, background 0.3s, color 0.3s;
 }
 .card:hover {
   transform: translateY(-2px);
 }
 
+/* Grid for projects */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1rem;
 }
 
+/* Tags / Skills */
 .tag, .skill {
   display: inline-block;
-  background: #e5e7eb;
   padding: 0.3rem 0.6rem;
   border-radius: 8px;
   margin: 0.2rem;
   font-size: 0.85em;
   cursor: pointer;
-  transition: background 0.2s;
+  font-weight: 500;
+  background: #e5e7eb;
+  color: #222;
+  transition: background 0.2s, color 0.2s;
 }
+
 .tag:hover, .skill:hover {
   background: #d1d5db;
 }
 
+/* Dark mode tags */
+body.dark .tag,
+body.dark .skill {
+  background: #333;
+  color: #eee;
+}
+
+body.dark .tag:hover,
+body.dark .skill:hover {
+  background: #444;
+}
+
+/* Form controls */
 .controls {
   margin: 0.5rem 0;
 }
@@ -72,13 +118,46 @@ input, button {
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 1em;
+  transition: background 0.2s, color 0.2s, border 0.2s;
 }
 
+/* Buttons */
 button {
   background: #2563eb;
   color: white;
   cursor: pointer;
+  border: none;
 }
 button:hover {
   background: #1d4ed8;
+}
+
+body.dark input {
+  background: #222;
+  color: #eee;
+  border: 1px solid #444;
+}
+
+body.dark button {
+  background: #3b82f6;
+}
+body.dark button:hover {
+  background: #2563eb;
+}
+
+/* Dark mode toggle button */
+#dark-mode-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: #111827;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+body.dark #dark-mode-toggle {
+  background: #f3f4f6;
+  color: #111;
 }
