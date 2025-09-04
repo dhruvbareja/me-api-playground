@@ -5,17 +5,22 @@ This is my submission for the Backend Assessment (Track A).
 It’s basically a small full-stack playground where I put my own profile, skills, projects, and work experience into a database and then exposed them via APIs. On top of that, there’s a minimal frontend to view/search the data.
 
 I built this to practice backend development with FastAPI and also connect it with a simple frontend.
+when you open the website link (hosted on render) please wait for 40-60 seconds as it would restart the server 
+after visitng the website click on login username-admin
+                                         password-password123
+you can add projects directly from the website but you first need to log in.	
+
+here is my resume link - https://drive.google.com/drive/folders/1JzRgkmC0UrVcCjUmUwrY2AMgdPNKIEL8?usp=sharing
 
 ⸻
 
 Tech Stack
-	•	Backend: FastAPI + SQLModel (SQLite by default, can also run on Postgres)
-	•	Frontend: Plain HTML + CSS + JavaScript (served from FastAPI)
-	•	Auth: Simple API key check (X-API-Key) for write operations
-	•	Database: SQLite (for local testing, easy to set up)
+	•	Backend: FastAPI + SQLModel (SQLite by default)
+	•	Frontend: Plain HTML + CSS + JavaScript served from fastapi
+	•	Auth Simple API key check X-API-Key for write operations
 
 ## Setup virtual environment and install requirements
-python -m venv .venv && source .venv/bin/activate   # On Windows: .venv\Scripts\activate
+on macbook - python -m venv .venv && source .venv/bin/activate   # On Windows: .venv\Scripts\activate
 pip install -r backend/requirements.txt
 
 # Set environment variables
@@ -26,7 +31,7 @@ Visit:
 	•	Frontend: http://127.0.0.1:8000/
 	•	API Docs: http://127.0.0.1:8000/docs
 
-# Run server
+#  to Run server
 uvicorn backend.app:app --reload
 ```
 Open http://127.0.0.1:8000/ to see the UI. API lives under `/api` (docs at `/docs`).
@@ -52,21 +57,10 @@ curl http://127.0.0.1:8000/api/health
 curl http://127.0.0.1:8000/api/projects
 
 curl -X POST http://127.0.0.1:8000/api/projects       -H "Content-Type: application/json"       -H "X-API-Key: $API_KEY"       -d '{"title":"New Project","description":"demo","skills":["Python","FastAPI"]}'
-```
 
-## Switch to Postgres (Optional)
-1. Set `DATABASE_URL=postgresql+psycopg2://user:pass@host:5432/dbname`
-2. Install driver: `pip install psycopg2-binary`
-3. Start app (tables auto-created).
-
-## Docker
-```bash
-docker build -t me-api .
-docker run -p 8000:8000 --env-file .env me-api
-```
 
 ## Deployment (One Container)
-- Use any Docker host (Render, Railway, Fly.io, etc).
+- Use any Docker host (Rende)
 - Expose port `8000`. Ensure env vars are set.
 
  Features Completed
